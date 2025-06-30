@@ -5,14 +5,15 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from "@mui/material";
+import { SortOptionsEnum } from "../types/SortOptionsEnum";
 
 type FilterDropdownProps = {
-  onSortChange: (sortBy: "dueDate" | "createDate") => void;
+  onSortChange: (sortBy: SortOptionsEnum) => void;
 };
 
 export const FilterDropdown = ({ onSortChange }: FilterDropdownProps) => {
   const handleChange = (e: SelectChangeEvent) => {
-    onSortChange(e.target.value as "dueDate" | "createDate");
+    onSortChange(e.target.value as SortOptionsEnum);
   };
 
   return (
