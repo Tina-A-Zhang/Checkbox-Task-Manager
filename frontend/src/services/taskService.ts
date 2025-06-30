@@ -1,16 +1,21 @@
-import axios from 'axios';
-import { Task } from '../types/Task';
-import { SortOptionsEnum } from '../types/SortOptionsEnum';
-import { TaskCreationType } from '../types/TaskCreationType';
+import axios from "axios";
+import { SortOptionsEnum } from "../types/SortOptionsEnum";
+import { TaskCreationType } from "../types/TaskCreationType";
+import { PaginatedTasksResponse } from "../types/PaginatedTasksResponse";
 
 export const addTaskAndRefresh = async (
-  task:TaskCreationType,
+  task: TaskCreationType,
   searchTerm: string,
-  sortBy: SortOptionsEnum
-): Promise<Task[]> => {
-  await axios.post('http://localhost:4000/tasks', task);
-  const res = await axios.get('http://localhost:4000/tasks', {
-    params: { search: searchTerm, sortBy },
+  sortBy: SortOptionsEnum,
+  page: number,
+  pageSize: number
+): Promise<PaginatedTasksResponse> => {
+  await axios.post("http://localhost:4000/tasks", task);
+  const res = await axios.get("http://localhost:4000/tasks", {
+    params: { search: searchTerm, sortBy, page, pageSize },
   });
-  return res.data;
+  return {
+    tasks: res.data.data,
+    total: res.data.total,
+  };
 };

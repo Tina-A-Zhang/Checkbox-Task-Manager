@@ -17,20 +17,30 @@ function App() {
   const [sortBy, setSortBy] = useState<SortOptionsEnum>(
     SortOptionsEnum.DueDate
   );
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10); // keep constant for now
+  const [total, setTotal] = useState(0);
+
   const [tasks, setTasks] = useState<Task[]>([]);
   useEffect(() => {
     axios
       .get("http://localhost:4000/tasks", {
-        params: { search: searchTerm, sortBy },
+        params: { search: searchTerm, sortBy, page, pageSize },
       })
-      .then((res) => setTasks(res.data))
+      .then((res) => {
+        setTasks(res.data.data);
+        setTotal(res.data.total);
+      })
       .catch((err) => console.error("Failed to fetch tasks", err));
-  }, [searchTerm, sortBy]);
+  }, [searchTerm, sortBy, page, pageSize]);
 
   const onAddTask = (newTask: TaskCreationType) => {
-    addTaskAndRefresh(newTask, searchTerm, sortBy)
-      .then((updatedTasks) => setTasks(updatedTasks))
-      .catch((err) => console.error("Failed to add task", err));
+    addTaskAndRefresh(newTask, searchTerm, sortBy, page, pageSize).then(
+      ({ tasks, total }) => {
+        setTasks(tasks);
+        setTotal(total);
+      }
+    );
   };
 
   return (

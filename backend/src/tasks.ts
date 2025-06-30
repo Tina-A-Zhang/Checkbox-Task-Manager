@@ -15,7 +15,12 @@ let tasks: Task[] = [];
 
 // Get tasks (optional search and sort)
 tasksRouter.get('/', (req, res) => {
-  const { search = '', sortBy = 'dueDate' } = req.query;
+  const {
+    search = '',
+    sortBy = 'dueDate',
+    page = '1',
+    pageSize = '10',
+  } = req.query;
 
   let filtered = tasks.filter((t) =>
     t.name.toLowerCase().includes((search as string).toLowerCase())
@@ -26,8 +31,21 @@ tasksRouter.get('/', (req, res) => {
     new Date(b[sortBy as keyof Task]).getTime()
   );
 
-  res.json(filtered);
+  // Pagination logic
+  const pageNumber = parseInt(page as string, 10);
+  const size = parseInt(pageSize as string, 10);
+  const start = (pageNumber - 1) * size;
+  const paginated = filtered.slice(start, start + size);
+
+  res.json({
+    total: filtered.length,
+    page: pageNumber,
+    pageSize: size,
+    data: paginated,
+  });
 });
+
+
 
 // Add task
 tasksRouter.post('/', (req, res) => {
