@@ -9,6 +9,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { SortOptionsEnum } from "./types/SortOptionsEnum";
 import { Task } from "./types/Task";
+import { addTaskAndRefresh } from "./services/taskService";
+import { TaskCreationType } from "./types/TaskCreationType";
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +27,12 @@ function App() {
       .catch((err) => console.error("Failed to fetch tasks", err));
   }, [searchTerm, sortBy]);
 
+  const onAddTask = (newTask: TaskCreationType) => {
+    addTaskAndRefresh(newTask, searchTerm, sortBy)
+      .then((updatedTasks) => setTasks(updatedTasks))
+      .catch((err) => console.error("Failed to add task", err));
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <HeaderBar onAddClick={() => setShowForm(true)} />
@@ -35,9 +43,7 @@ function App() {
       <TaskForm
         open={showForm}
         onClose={() => setShowForm(false)}
-        onSubmit={() => {
-          console.log("adding new task");
-        }}
+        onSubmit={(newTask) => onAddTask(newTask)}
       />
     </LocalizationProvider>
   );

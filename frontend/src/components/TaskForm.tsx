@@ -8,15 +8,12 @@ import {
   Button,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TaskCreationType } from "../types/TaskCreationType";
 
 type TaskFormProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (task: {
-    name: string;
-    description: string;
-    dueDate: string;
-  }) => void;
+  onSubmit: (task: TaskCreationType) => void;
 };
 
 export const TaskForm = ({ open, onClose, onSubmit }: TaskFormProps) => {
