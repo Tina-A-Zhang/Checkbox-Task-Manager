@@ -103,3 +103,31 @@ You can also customize the API base URL by creating a `.env` file:
 ```env
 REACT_APP_API_URL=http://your-api-url
 ```
+
+---
+
+## ✨ Final Notes
+
+### 🧭 How I approached the "Should Have" user stories
+I treated the "should have" stories with nearly the same priority as core requirements because they directly impact **usability and scalability**. Here’s how I approached each:
+
+- **Sorting by due date or creation date:**  
+  Implemented via a dropdown + enum values passed to the API. The backend supports this logic through query parameters.
+
+- **Toggle sort direction:**  
+  Simple ascending/descending switch with UI feedback and API query param.
+
+- **Search by name (with highlight):**  
+  Added a debounced search bar that highlights matched substrings using a RegEx-based text splitter.
+
+These were all implemented with **clean separation of concerns**, **strong typing**, and **minimal dependencies**, aiming for clarity and scalability.
+
+---
+
+### 🛠️ Improvements I'd Make with More Time
+
+- Add **toast notifications** (e.g., success/failure) for task actions  
+- Add **unit tests** (especially for logic-heavy functions like sorting, status badge logic, etc.)
+- Use **React Context or Zustand** if state complexity grows (e.g., task filters across routes)
+- Consider using **React Query** or SWR for smarter fetching and caching
+- Add a **clear button** to the search bar (I chose not to use deprecated APIs and ran out of time to implement a proper one)
