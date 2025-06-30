@@ -11,6 +11,7 @@ import { SortOptionsEnum } from "./types/SortOptionsEnum";
 import { Task } from "./types/Task";
 import { addTaskAndRefresh } from "./services/taskService";
 import { TaskCreationType } from "./types/TaskCreationType";
+import { PaginationBar } from "./components/PaginationBar";
 function App() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,6 +23,7 @@ function App() {
   const [total, setTotal] = useState(0);
 
   const [tasks, setTasks] = useState<Task[]>([]);
+
   useEffect(() => {
     axios
       .get("http://localhost:4000/tasks", {
@@ -32,7 +34,11 @@ function App() {
         setTotal(res.data.total);
       })
       .catch((err) => console.error("Failed to fetch tasks", err));
-  }, [searchTerm, sortBy, page, pageSize]);
+  }, [searchTerm, sortBy, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, sortBy]);
 
   const onAddTask = (newTask: TaskCreationType) => {
     addTaskAndRefresh(newTask, searchTerm, sortBy, page, pageSize).then(
@@ -49,6 +55,12 @@ function App() {
       <Box px={3}>
         <NavBar onSearch={setSearchTerm} onSortChange={setSortBy} />
         <TaskList tasks={tasks} />
+        <PaginationBar
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={(newPage) => setPage(newPage)}
+        />
       </Box>
       <TaskForm
         open={showForm}
