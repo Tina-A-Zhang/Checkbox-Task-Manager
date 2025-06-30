@@ -73,6 +73,7 @@ I assumed a RESTful backend with the following structure:
   "data": [/* task objects */],
   "total": 1234
 }
+```
 
 ### 5. How to Run It
 
@@ -81,7 +82,7 @@ I assumed a RESTful backend with the following structure:
 cd frontend
 npm install
 npm start
-````
+```
 
 #### ▶️ Start the app
 Open a separate terminal
