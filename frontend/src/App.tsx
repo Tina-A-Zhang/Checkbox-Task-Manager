@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { debounce } from "lodash";
 import { HeaderBar } from "./components/HeaderBar";
 import { NavBar } from "./components/NavBar";
 import { TaskList } from "./components/TaskList";
@@ -23,7 +24,7 @@ function App() {
   const [sortOrder, setSortOrder] = useState<SortOrderEnum>(SortOrderEnum.Asc);
 
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10); // keep constant for now
+  const [pageSize] = useState(10);
   const [total, setTotal] = useState(0);
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -59,12 +60,18 @@ function App() {
     );
   };
 
+  const debouncedSearch = useRef(
+    debounce((value) => {
+      setSearchTerm(value);
+    }, 300)
+  ).current;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <HeaderBar onAddClick={() => setShowForm(true)} />
       <Box px={3}>
         <NavBar
-          onSearch={setSearchTerm}
+          onSearch={(value) => debouncedSearch(value)}
           onSortChange={setSortBy}
           sortBy={sortBy}
           sortOrder={sortOrder}
