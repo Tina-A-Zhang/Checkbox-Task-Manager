@@ -1,14 +1,16 @@
 import { Card, CardContent, Typography, Chip } from "@mui/material";
 import { format } from "date-fns";
 import { Task } from "../types/Task";
+import { TaskStatusEnum } from "../types/TaskStatusEnum";
 
-const getStatus = (dueDate: string): "Not urgent" | "Due soon" | "Overdue" => {
+const getStatus = (dueDate: string): TaskStatusEnum => {
   const now = new Date();
   const due = new Date(dueDate);
   const diff = (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-  if (diff < 0) return "Overdue";
-  if (diff <= 7) return "Due soon";
-  return "Not urgent";
+  if (diff < 0) return TaskStatusEnum.Overdue;
+  if (diff <= 7) return TaskStatusEnum.DueSoon;
+
+  return TaskStatusEnum.NotUrgent;
 };
 
 export const TaskCard = ({ task }: { task: Task }) => {
@@ -30,9 +32,9 @@ export const TaskCard = ({ task }: { task: Task }) => {
         <Chip
           label={status}
           color={
-            status === "Overdue"
+            status === TaskStatusEnum.Overdue
               ? "error"
-              : status === "Due soon"
+              : status === TaskStatusEnum.DueSoon
               ? "warning"
               : "default"
           }
