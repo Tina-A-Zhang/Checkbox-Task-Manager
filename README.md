@@ -131,3 +131,25 @@ These were all implemented with **clean separation of concerns**, **strong typin
 - Use **React Context or Zustand** if state complexity grows (e.g., task filters across routes)
 - Consider using **React Query** or SWR for smarter fetching and caching
 - Add a **clear button** to the search bar (I chose not to use deprecated APIs and ran out of time to implement a proper one)
+
+---
+
+## 📦 External Libraries Used
+
+- **Axios** – For HTTP requests (`axios`)  
+  → Clean, promise-based API and better error handling than `fetch`.
+
+- **Lodash.debounce** – For debouncing search input  
+  → Lightweight and reliable for input throttling without writing custom logic.
+
+- **date-fns** – For date formatting (`format()`)  
+  → Modern, lightweight alternative to Moment.js, tree-shakeable and simple.
+
+- **MUI (Material UI)** – UI components (`@mui/material`, `@mui/icons-material`)  
+  → To save time on layout and accessibility-ready components without designing from scratch.
+
+- **@mui/x-date-pickers** – For a clean and accessible date picker  
+  → Integrates well with MUI and provides a polished date input UX.
+
+> I intentionally avoided larger state/data libraries to keep the app light and transparent.
+
