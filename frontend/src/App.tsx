@@ -70,7 +70,7 @@ function App() {
           sortOrder={sortOrder}
           onSortOrderChange={onSortOrderChange}
         />
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} searchTerm={searchTerm} />
         <PaginationBar
           page={page}
           pageSize={pageSize}

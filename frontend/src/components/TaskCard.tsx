@@ -3,6 +3,11 @@ import { format } from "date-fns";
 import { Task } from "../types/Task";
 import { TaskStatusEnum } from "../types/TaskStatusEnum";
 
+type TaskCardProps = {
+  task: Task;
+  searchTerm?: string;
+};
+
 const getStatus = (dueDate: string): TaskStatusEnum => {
   const now = new Date();
   const due = new Date(dueDate);
@@ -13,13 +18,30 @@ const getStatus = (dueDate: string): TaskStatusEnum => {
   return TaskStatusEnum.NotUrgent;
 };
 
-export const TaskCard = ({ task }: { task: Task }) => {
+export const TaskCard = ({ task, searchTerm = "" }: TaskCardProps) => {
+  const highlightText = (text: string, highlight: string) => {
+    if (!highlight) return text;
+
+    const regex = new RegExp(`(${highlight})`, "ig");
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+      part.toLowerCase() === highlight.toLowerCase() ? (
+        <span key={i} style={{ backgroundColor: "yellow" }}>
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
   const status = getStatus(task.dueDate);
 
   return (
     <Card sx={{ marginBottom: 2 }} raised>
       <CardContent>
-        <Typography variant="h5">{task.name}</Typography>
+        <Typography variant="h5">
+          {highlightText(task.name, searchTerm)}
+        </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           {task.description}
         </Typography>

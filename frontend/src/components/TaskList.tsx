@@ -6,13 +6,14 @@ import { SortOptionsEnum } from "../types/SortOptionsEnum";
 
 type TaskListProps = {
   tasks: Task[];
+  searchTerm?: string;
 };
 
-export const TaskList = ({ tasks }: TaskListProps) => {
+export const TaskList = ({ tasks, searchTerm }: TaskListProps) => {
   return (
     <>
       {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
+        <TaskCard key={task.id} task={task} searchTerm={searchTerm} />
       ))}
     </>
   );
