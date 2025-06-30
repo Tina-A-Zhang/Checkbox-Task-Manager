@@ -1,5 +1,4 @@
 import { TaskCard, Task } from "./TaskCard";
-import { Box } from "@mui/material";
 
 const mockTasks: Task[] = [
   {
@@ -41,11 +40,11 @@ const mockTasks: Task[] = [
 
 export const TaskList = () => {
   return (
-    <Box px={2}>
+    <>
       {mockTasks.map((task) => (
         <TaskCard key={task.id} task={task} />
       ))}
-    </Box>
+    </>
   );
 };
 
