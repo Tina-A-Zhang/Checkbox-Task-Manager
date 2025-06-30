@@ -1,11 +1,7 @@
 import express from "express";
-type Task = {
-  id: string;
-  name: string;
-  description: string;
-  dueDate: string;
-  createDate: string;
-};
+import { SortOptionsEnum } from "./types/SortOptionsEnum";
+import { SortOrderEnum } from "./types/SortOrderEnum";
+import { Task } from "./types/Task";
 
 export const tasksRouter = express.Router();
 
@@ -15,8 +11,8 @@ let tasks: Task[] = [];
 tasksRouter.get("/", (req, res) => {
   const {
     search = "",
-    sortBy = "dueDate",
-    sortOrder = "asc",
+    sortBy = SortOptionsEnum.DueDate,
+    sortOrder = SortOrderEnum.Asc,
     page = "1",
     pageSize = "10",
   } = req.query;
@@ -28,7 +24,7 @@ tasksRouter.get("/", (req, res) => {
   filtered.sort((a, b) => {
     const aVal = new Date(a[sortBy as keyof Task]).getTime();
     const bVal = new Date(b[sortBy as keyof Task]).getTime();
-    return sortOrder === "desc" ? bVal - aVal : aVal - bVal;
+    return sortOrder === SortOrderEnum.Desc ? bVal - aVal : aVal - bVal;
   });
 
   // Pagination logic
