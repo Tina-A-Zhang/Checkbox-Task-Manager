@@ -9,147 +9,114 @@ This repository showcases a simple yet scalable implementation of a task managem
 
 ## 🎯 Features Implemented
 
-### Core Requirements
-- Create new tasks with required fields: name, description, due date
-- View all tasks in a list view with:
+### Core Features
+- Create new tasks with name, description, and due date
+- View all tasks in a paginated, sortable list with:
   - Name, Description, Due Date, Create Date
-  - Status badges: Not Urgent / Due Soon / Overdue (based on due date logic)
-- Edit tasks (inline modal form)
-- Pagination and sorting support
-- Real-time search with debounced input
+  - Status badge: Not Urgent / Due Soon / Overdue
+- Edit tasks via a modal form
+- Real-time debounced search
 
 ### "Should Have" Features
-- Sort by due date or create date
-- Toggle sort direction (ascending/descending)
-- Search by name (with highlighted results)
+- Sort by due date or creation date
+- Toggle ascending/descending order
+- Search by task name with match highlighting
 
 ---
 
-## 🧠 Key Design Decisions
+## 🧠 Design Decisions
 
-### 1. Why No State Management / Data Fetching Library
-I chose **not to introduce Redux, Zustand, React Query**, etc., because:
-- The project scope is **intentionally simple**, and React’s built-in hooks (`useState`, `useEffect`) are sufficient.
-- This approach avoids overengineering while keeping the code **clean and readable**.
-- In a larger production app, I would adopt a state or data-fetching library once cross-component state or caching becomes painful.
+### 1. Keeping It Simple: No External State/Data Libraries
+I intentionally avoided libraries like Redux, Zustand, or React Query to keep the app lean and readable. React’s built-in hooks (`useState`, `useEffect`) are sufficient for the current scope.  
+If the project scaled (e.g. global filters, caching), I’d consider React Query or Context.
 
-> ✅ For this task, simplicity over abstraction made the most sense.
+### 2. Scaling Strategy: Thousands of Tasks
+To handle the risk of large datasets:
+- ✅ **Server-side pagination** via `page` and `pageSize` query params
+- ✅ **Debounced search** to limit network requests
+- ✅ Lightweight rendering of task items
+- ✅ Reusable, isolated components
 
----
+Result: The app performs well even with large datasets, without complex techniques like virtual scrolling.
 
-### 2. How I Handled the Main Risk: Scale
-One of the main risks mentioned was the possibility of **thousands of tasks**. Here's how I addressed that:
+### 3. Shared Modal Form Component
+The `TaskForm` component handles both creation and editing:
+- Takes `mode` prop (`Create` or `Edit`)
+- Uses `initialData` for pre-filling during edits
+- Validates presence of all required fields
 
-- ✅ **Server-side pagination**: Client never loads all tasks at once.
-- ✅ API accepts `page`, `pageSize`, `search`, `sortBy`, and `sortOrder`.
-- ✅ **Debounced search input** (300ms) prevents excessive network calls.
-- ✅ **Lightweight `TaskCard` rendering** avoids performance bottlenecks.
-- ✅ Components are structured for **reusability and isolation**.
-
-> Result: Efficient and performant even with large datasets, without needing virtual scroll.
-
----
-
-### 3. Shared Modal Form Strategy
-- A single `TaskForm` component is reused for both create/edit flows.
-- `mode` prop (`Create` or `Edit`) dynamically changes dialog label and button.
-- `initialData` pre-fills the form during edit.
-- Validation ensures `name`, `description`, and `dueDate` are present before submit.
-
----
-
-### 4. API Assumptions
-I assumed a RESTful backend with the following structure:
+### 4. Backend Assumptions
 
 #### Endpoints
-- `POST /tasks`: Create a task
+- `POST /tasks`: Create task  
 - `GET /tasks`: List tasks  
-   → accepts query params: `search`, `sortBy`, `sortOrder`, `page`, `pageSize`
-- `PUT /tasks/:id`: Edit a task
+  → accepts `search`, `sortBy`, `sortOrder`, `page`, `pageSize`  
+- `PUT /tasks/:id`: Edit task
 
-#### Response format for `GET /tasks`
+#### Sample Response Format
 ```json
 {
   "data": [/* task objects */],
   "total": 1234
 }
 ```
+### 5.▶️ Getting Started
 
-### 5. How to Run It
-
-#### ▶️ Run the frontend
+#### Frontend
 ```bash
 cd frontend
 npm install
 npm start
 ```
-
-#### ▶️ Start the app
-Open a separate terminal
+#### Backend
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-
-Make sure the backend is running at:
-
-```
-http://localhost:4000
-```
-
-You can also customize the API base URL by creating a `.env` file:
+Ensure the backend runs at http://localhost:4000, or update it via .env:
 
 ```env
+
 REACT_APP_API_URL=http://your-api-url
 ```
+### 6.💡 "Should Have" Story Implementation
+Each of these features was implemented with a clean separation of concerns and scalable design:
 
----
+- Sort by due/created date: Dropdown menu sends enum value to API via query params.
+- Toggle sort direction: Simple toggle with visual feedback and controlled param (asc/desc).
+- Search by name: Debounced (300ms) input sends query to API. Highlights matching substrings via RegEx-based text splitter.
 
-## ✨ Final Notes
+### 7.📦 External Libraries Used
+Library	Purpose
+- `axios`	HTTP requests with better ergonomics than fetch
+- `lodash.debounce`	Debounced search input
+- `date-fns`	Lightweight date formatting
+- `@mui/material`	UI components & layout
+- `@mui/icons-material`	Icons
+- `@mui/x-date-pickers`	Accessible date picker
 
-### 🧭 How I approached the "Should Have" user stories
-I treated the "should have" stories with nearly the same priority as core requirements because they directly impact **usability and scalability**. Here’s how I approached each:
+### 8.🛠️ Improvements with More Time
+Here’s what I would add or refine, and how I’d approach each:
 
-- **Sorting by due date or creation date:**  
-  Implemented via a dropdown + enum values passed to the API. The backend supports this logic through query parameters.
-
-- **Toggle sort direction:**  
-  Simple ascending/descending switch with UI feedback and API query param.
-
-- **Search by name (with highlight):**  
-  Added a debounced search bar that highlights matched substrings using a RegEx-based text splitter.
-
-These were all implemented with **clean separation of concerns**, **strong typing**, and **minimal dependencies**, aiming for clarity and scalability.
-
----
-
-### 🛠️ Improvements I'd Make with More Time
-
-- Add **toast notifications** (e.g., success/failure) for task actions  
-- Add **unit tests** (especially for logic-heavy functions like sorting, status badge logic, etc.)
-- Use **React Context or Zustand** if state complexity grows (e.g., task filters across routes)
-- Consider using **React Query** or SWR for smarter fetching and caching
-- Add a **clear button** to the search bar (I chose not to use deprecated APIs and ran out of time to implement a proper one)
-
----
-
-## 📦 External Libraries Used
-
-- **Axios** – For HTTP requests (`axios`)  
-  → Clean, promise-based API and better error handling than `fetch`.
-
-- **Lodash.debounce** – For debouncing search input  
-  → Lightweight and reliable for input throttling without writing custom logic.
-
-- **date-fns** – For date formatting (`format()`)  
-  → Modern, lightweight alternative to Moment.js, tree-shakeable and simple.
-
-- **MUI (Material UI)** – UI components (`@mui/material`, `@mui/icons-material`)  
-  → To save time on layout and accessibility-ready components without designing from scratch.
-
-- **@mui/x-date-pickers** – For a clean and accessible date picker  
-  → Integrates well with MUI and provides a polished date input UX.
-
-> I intentionally avoided larger state/data libraries to keep the app light and transparent.
-
+- Task Deletion
+  - Add delete button on each card
+  -  Confirm dialog → DELETE /tasks/:id → optimistic UI update
+- Toast Notifications
+  - Show success/failure using a library like notistack or MUI Snackbar
+- Better Validation & Error Handling
+  - Use yup schema for validation
+  - Catch API/network errors gracefully
+- Persist Search/Sort State in URL
+  - Use useSearchParams() to make filters sharable/bookmarkable
+- Empty & Loading States
+  - Message for no matching results
+  - Loading spinner for data fetch
+- Accessibility
+  - Ensure full keyboard navigation
+  - Add appropriate aria tags
+- Testing
+  - Unit tests for TaskCard, TaskForm
+  - Integration tests with React Testing Library or Playwright
+- Mobile Responsiveness
+  - Use MUI Grid & media queries to support smaller screens
