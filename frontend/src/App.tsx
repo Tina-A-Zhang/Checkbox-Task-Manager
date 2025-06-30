@@ -14,6 +14,9 @@ import { addTaskAndRefresh } from "./services/taskService";
 import { TaskCreationType } from "./types/TaskCreationType";
 import { PaginationBar } from "./components/PaginationBar";
 import { SortOrderEnum } from "./types/SortOrderEnum";
+import { TaskFormModeEnum } from "./types/TaskFormModeEnum";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
 
 function App() {
   const [showForm, setShowForm] = useState(false);
@@ -22,6 +25,7 @@ function App() {
     SortOptionsEnum.DueDate
   );
   const [sortOrder, setSortOrder] = useState<SortOrderEnum>(SortOrderEnum.Asc);
+  const [editTask, setEditTask] = useState<Task | null>(null);
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -29,15 +33,20 @@ function App() {
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const onSortOrderChange = () => {
+  const onToggleSortOrder = () => {
     setSortOrder(
       sortOrder === SortOrderEnum.Asc ? SortOrderEnum.Desc : SortOrderEnum.Asc
     );
   };
 
-  useEffect(() => {
+  const onEditClick = (task: Task) => {
+    setEditTask(task);
+    setShowForm(true);
+  };
+
+  const fetchTasks = () => {
     axios
-      .get("http://localhost:4000/tasks", {
+      .get(`${API_URL}/tasks`, {
         params: { search: searchTerm, sortBy, sortOrder, page, pageSize },
       })
       .then((res) => {
@@ -45,6 +54,10 @@ function App() {
         setTotal(res.data.total);
       })
       .catch((err) => console.error("Failed to fetch tasks", err));
+  };
+
+  useEffect(() => {
+    fetchTasks();
   }, [searchTerm, sortBy, sortOrder, page]);
 
   useEffect(() => {
@@ -52,19 +65,42 @@ function App() {
   }, [searchTerm, sortBy, sortOrder]);
 
   const onAddTask = (newTask: TaskCreationType) => {
-    addTaskAndRefresh(newTask, searchTerm, sortBy, page, pageSize).then(
-      ({ tasks, total }) => {
-        setTasks(tasks);
-        setTotal(total);
-      }
-    );
+    addTaskAndRefresh(
+      newTask,
+      searchTerm,
+      sortBy,
+      sortOrder,
+      page,
+      pageSize
+    ).then(({ tasks, total }) => {
+      setTasks(tasks);
+      setTotal(total);
+    });
+  };
+
+  const onEditTask = (updatedTask: TaskCreationType) => {
+    if (!editTask) return;
+
+    axios
+      .put(`${API_URL}/tasks/${editTask.id}`, updatedTask)
+      .then(() => {
+        setEditTask(null);
+        setShowForm(false);
+        fetchTasks();
+      })
+      .catch((err) => console.error("Failed to update task", err));
   };
 
   const debouncedSearch = useRef(
-    debounce((value) => {
+    debounce((value: string) => {
       setSearchTerm(value);
     }, 300)
   ).current;
+
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditTask(null);
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -75,9 +111,13 @@ function App() {
           onSortChange={setSortBy}
           sortBy={sortBy}
           sortOrder={sortOrder}
-          onSortOrderChange={onSortOrderChange}
+          onToggleSortOrder={onToggleSortOrder}
         />
-        <TaskList tasks={tasks} searchTerm={searchTerm} />
+        <TaskList
+          tasks={tasks}
+          searchTerm={searchTerm}
+          onEditClick={onEditClick}
+        />
         <PaginationBar
           page={page}
           pageSize={pageSize}
@@ -87,8 +127,18 @@ function App() {
       </Box>
       <TaskForm
         open={showForm}
-        onClose={() => setShowForm(false)}
-        onSubmit={(newTask) => onAddTask(newTask)}
+        onClose={handleFormClose}
+        onSubmit={editTask ? onEditTask : onAddTask}
+        initialData={
+          editTask
+            ? {
+                name: editTask.name,
+                description: editTask.description,
+                dueDate: editTask.dueDate,
+              }
+            : undefined
+        }
+        mode={editTask ? TaskFormModeEnum.Edit : TaskFormModeEnum.Create}
       />
     </LocalizationProvider>
   );

@@ -16,14 +16,14 @@ type FilterDropdownProps = {
   sortBy: SortOptionsEnum;
   sortOrder: SortOrderEnum;
   onSortChange: (sortBy: SortOptionsEnum) => void;
-  onSortOrderChange: (sortOrder: SortOrderEnum) => void;
+  onToggleSortOrder: () => void;
 };
 
 export const FilterDropdown = ({
   sortBy,
   sortOrder,
   onSortChange,
-  onSortOrderChange,
+  onToggleSortOrder,
 }: FilterDropdownProps) => {
   const handleChange = (e: SelectChangeEvent) => {
     onSortChange(e.target.value as SortOptionsEnum);
@@ -38,7 +38,12 @@ export const FilterDropdown = ({
           <MenuItem value={SortOptionsEnum.CreateDate}>Create Date</MenuItem>
         </Select>
       </FormControl>
-      <IconButton onClick={() => onSortOrderChange(sortOrder)} size="small">
+
+      <IconButton
+        onClick={() => onToggleSortOrder()}
+        size="small"
+        aria-label="Toggle sort order"
+      >
         {sortOrder === SortOrderEnum.Asc ? (
           <ArrowUpwardIcon />
         ) : (
@@ -48,5 +53,3 @@ export const FilterDropdown = ({
     </Box>
   );
 };
-
-export {};

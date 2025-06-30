@@ -15,6 +15,10 @@ export const PaginationBar = ({
 }: PaginationBarProps) => {
   const totalPages = Math.ceil(total / pageSize);
 
+  if (total === 0) {
+    return <Typography>No tasks found.</Typography>;
+  }
+
   return (
     <Box
       display="flex"
@@ -31,6 +35,7 @@ export const PaginationBar = ({
         page={page}
         onChange={(_, value) => onPageChange(value)}
         color="primary"
+        aria-label="Pagination Navigation"
       />
     </Box>
   );

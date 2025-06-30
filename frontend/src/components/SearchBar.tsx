@@ -13,11 +13,11 @@ export const SearchBar = ({ onSearch }: SearchBarProps) => {
   return (
     <TextField
       label="Search tasks"
+      aria-label="Search tasks"
+      placeholder="Type to search..."
       variant="outlined"
       size="small"
       onChange={handleChange}
     />
   );
 };
-
-export {};

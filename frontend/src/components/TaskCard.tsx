@@ -1,4 +1,5 @@
-import { Card, CardContent, Typography, Chip } from "@mui/material";
+import { Card, CardContent, Typography, Chip, IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import { format } from "date-fns";
 import { Task } from "../types/Task";
 import { TaskStatusEnum } from "../types/TaskStatusEnum";
@@ -6,6 +7,7 @@ import { TaskStatusEnum } from "../types/TaskStatusEnum";
 type TaskCardProps = {
   task: Task;
   searchTerm?: string;
+  onEditClick: (task: Task) => void;
 };
 
 const getStatus = (dueDate: string): TaskStatusEnum => {
@@ -14,11 +16,14 @@ const getStatus = (dueDate: string): TaskStatusEnum => {
   const diff = (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
   if (diff < 0) return TaskStatusEnum.Overdue;
   if (diff <= 7) return TaskStatusEnum.DueSoon;
-
   return TaskStatusEnum.NotUrgent;
 };
 
-export const TaskCard = ({ task, searchTerm = "" }: TaskCardProps) => {
+export const TaskCard = ({
+  task,
+  searchTerm = "",
+  onEditClick,
+}: TaskCardProps) => {
   const highlightText = (text: string, highlight: string) => {
     if (!highlight) return text;
 
@@ -34,10 +39,19 @@ export const TaskCard = ({ task, searchTerm = "" }: TaskCardProps) => {
       )
     );
   };
+
   const status = getStatus(task.dueDate);
 
   return (
-    <Card sx={{ marginBottom: 2 }} raised>
+    <Card sx={{ marginBottom: 2, position: "relative" }} raised>
+      <IconButton
+        size="small"
+        aria-label={`Edit task ${task.name}`}
+        onClick={() => onEditClick(task)}
+        sx={{ position: "absolute", top: 4, right: 4 }}
+      >
+        <EditIcon fontSize="small" />
+      </IconButton>
       <CardContent>
         <Typography variant="h5">
           {highlightText(task.name, searchTerm)}
@@ -66,5 +80,3 @@ export const TaskCard = ({ task, searchTerm = "" }: TaskCardProps) => {
     </Card>
   );
 };
-
-export {};

@@ -9,7 +9,7 @@ type NavBarProps = {
   onSortChange: (sortBy: SortOptionsEnum) => void;
   sortBy: SortOptionsEnum;
   sortOrder: SortOrderEnum;
-  onSortOrderChange: (sortBy: SortOrderEnum) => void;
+  onToggleSortOrder: () => void;
 };
 
 export const NavBar = ({
@@ -17,7 +17,7 @@ export const NavBar = ({
   onSortChange,
   sortBy,
   sortOrder,
-  onSortOrderChange,
+  onToggleSortOrder,
 }: NavBarProps) => {
   return (
     <Box
@@ -31,10 +31,8 @@ export const NavBar = ({
         onSortChange={onSortChange}
         sortBy={sortBy}
         sortOrder={sortOrder}
-        onSortOrderChange={onSortOrderChange}
+        onToggleSortOrder={onToggleSortOrder}
       />
     </Box>
   );
 };
-
-export {};

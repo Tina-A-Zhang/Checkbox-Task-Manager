@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,20 +9,41 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TaskCreationType } from "../types/TaskCreationType";
+import { TaskFormModeEnum } from "../types/TaskFormModeEnum";
 
 type TaskFormProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (task: TaskCreationType) => void;
+  initialData?: TaskCreationType; // for editing
+  mode?: TaskFormModeEnum;
 };
 
-export const TaskForm = ({ open, onClose, onSubmit }: TaskFormProps) => {
+export const TaskForm = ({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  mode,
+}: TaskFormProps) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | null>(null);
 
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setDescription(initialData.description);
+      setDueDate(new Date(initialData.dueDate));
+    } else {
+      setName("");
+      setDescription("");
+      setDueDate(null);
+    }
+  }, [initialData, open]);
+
   const handleSubmit = () => {
-    if (!name || !dueDate) return;
+    if (!name || !dueDate || !description) return;
     onSubmit({
       name,
       description,
@@ -36,7 +57,9 @@ export const TaskForm = ({ open, onClose, onSubmit }: TaskFormProps) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Add New Task</DialogTitle>
+      <DialogTitle>
+        {mode === TaskFormModeEnum.Edit ? "Edit Task" : "Add New Task"}
+      </DialogTitle>
       <DialogContent>
         <TextField
           label="Name"
@@ -49,6 +72,7 @@ export const TaskForm = ({ open, onClose, onSubmit }: TaskFormProps) => {
         <TextField
           label="Description"
           fullWidth
+          required
           margin="dense"
           multiline
           value={description}
@@ -68,13 +92,11 @@ export const TaskForm = ({ open, onClose, onSubmit }: TaskFormProps) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!name || !dueDate}
+          disabled={!name || !dueDate || !description}
         >
-          Add
+          {mode === TaskFormModeEnum.Edit ? "Save Changes" : "Add"}
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
-
-export {};
